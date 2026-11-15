@@ -1,0 +1,74 @@
+.lens-workspace {max-width: 1050px}
+.lens-workspace h1 {max-width: 19ch}
+.lens-status {padding: 10px 14px; border-radius: 6px; border: 1px solid #6f5633; color: #f6d29e}
+.lens-workspace section {margin: 28px 0}
+.lens-workspace li {margin-bottom: 7px}
+.lens-workspace dl div {padding-block: 10px; border-top: 1px solid var(--line)}
+.lens-workspace dt {font-weight: 700}
+.lens-workspace dd {margin: 5px 0 0; color: var(--muted)}
+@media (max-width: 385px) {.top nav {flex-wrap: wrap; justify-content: flex-start; column-gap: 16px}}
+
+.water-matched-trends {margin: 0; padding-inline-start: 17px}
+.water-matched-trends li:last-child {margin-bottom: 0}
+
+.heat-map svg {display:block;width:100%;max-width:520px;max-height:380px;background:#091626;border:1px solid var(--line);border-radius:12px}
+.heat-map path:hover {stroke:#fff;stroke-width:.0035}
+
+.heat-series {margin:20px 0}
+.heat-series figcaption {font-weight:700}
+.heat-series svg {width:100%;max-width:760px;display:block;background:#091626;border-radius:12px}
+.heat-series svg line {stroke:#394a63}
+.heat-series svg text {fill:#d5dfef;font-size:13px}
+
+.workspace.lens-overview {max-width:1460px;padding-top:24px}
+.lens-overview-hero {
+  position:relative;isolation:isolate;overflow:hidden;display:flex;align-items:center;
+  background:#0d1d2b;border:1px solid #2b4655;border-radius:14px;min-height:240px;
+  padding:clamp(20px,4vw,52px);margin-bottom:18px;
+}
+.lens-overview-intro {position:relative;z-index:1;max-width:540px}
+.lens-overview .lens-overview-intro h1 {max-width:none;margin:0;font-size:clamp(35px,5.4vw,72px);line-height:1;letter-spacing:-.04em;text-wrap:balance}
+.lens-overview-intro p {max-width:44ch;margin:14px 0 0;color:#c0d6e0}
+.lens-overview-hero .atlas-earth-scene {right:5%;scale:1.22}
+.lens-overview-hero .atlas-earth {filter:saturate(.8) brightness(.9)}
+.lens-overview-hero .atlas-track {animation:lens-orbit-reveal 1.2s cubic-bezier(.16,1,.3,1) both}
+@keyframes lens-orbit-reveal {from {rotate:-48deg;opacity:.3} to {rotate:0deg;opacity:1}}
+.lens-index {display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:16px}
+.lens-card {
+  --lens-color:#87dbe9;display:grid;grid-template-rows:1fr auto auto;min-width:0;
+  color:#edf7fc;background:#101d2a;border:1px solid #35495a;border-radius:12px;
+  transition:border-color .2s,background .2s;overflow:hidden;
+}
+.lens-card--urban-heat-growth {--lens-color:#f5b386}
+.lens-card--land-cover-forest {--lens-color:#a0e4bd}
+.lens-card:hover,.lens-card:focus-visible {border-color:var(--lens-color);background:#162637}
+.lens-card-copy {padding:20px 20px 10px}
+.lens-card h2 {font-size:clamp(20px,2.1vw,28px);line-height:1.1;letter-spacing:-.025em;margin:0;color:var(--lens-color)}
+.lens-card-copy p {margin:6px 0;font-size:14px;color:#b9ccdc}
+.lens-card-copy .lens-question {color:#ecf6fc;font-size:16px;font-weight:600;margin:10px 0 4px}
+.lens-preview {margin:0 12px;padding:12px;background:#091723;border:1px solid #293f50;border-radius:8px}
+.lens-preview figcaption {display:grid;gap:2px;color:#d8e8f2;font-size:.8rem;line-height:1.4}
+.lens-preview figcaption span {color:#a9c0d3;font-size:.75rem}
+.lens-chart {display:block;width:100%;max-height:142px;margin-top:6px;overflow:visible}
+.lens-chart line {stroke:#385165;stroke-width:1}
+.lens-chart text {font-size:10px;fill:#b4cddd;font-variant-numeric:tabular-nums}
+.lens-chart path {fill:none;stroke:var(--lens-color);stroke-width:2}
+.lens-chart circle {fill:var(--lens-color)}
+.lens-preview-state {min-height:100px;margin:8px 0 0;display:grid;place-items:center;font-size:13px}
+.lens-card-open {display:flex;justify-content:space-between;align-items:center;gap:10px;padding:14px 20px;color:var(--lens-color);font-size:.89rem;font-weight:700}
+.lens-card-open i {width:8px;height:8px;border:solid currentColor;border-width:1px 1px 0 0;rotate:45deg}
+@media(max-width:880px) {
+  .lens-index {gap:10px}
+  .lens-card-copy {padding-inline:14px}
+  .lens-overview-hero .atlas-earth-scene {right:-9%;opacity:.7}
+}
+@media(max-width:690px) {
+  .lens-index {grid-template-columns:1fr;gap:14px}
+  .lens-overview-hero {min-height:175px}
+  .lens-overview-hero .atlas-earth-scene {right:-225px;opacity:.27}
+  .lens-chart {max-height:160px}
+}
+@media(prefers-reduced-motion:reduce) {.lens-overview-hero .atlas-track {animation:none}}
+
+.lens-preview .lens-latest {color:var(--lens-color);font-variant-numeric:tabular-nums}
+@media(max-width:560px) {.workspace.lens-overview {padding-top:37px}}

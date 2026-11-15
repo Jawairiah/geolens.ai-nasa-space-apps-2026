@@ -1,0 +1,40 @@
+services:
+  db:
+    image: postgis/postgis:16-3.4
+    environment:
+      POSTGRES_USER: geolens
+      POSTGRES_DB: geolens
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?Set POSTGRES_PASSWORD in .env}
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+      - ./backend/schema.sql:/docker-entrypoint-initdb.d/20-geolens.sql:ro
+      - ./backend/inspections.sql:/docker-entrypoint-initdb.d/30-inspections.sql:ro
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U geolens"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+  api:
+    build: .
+    environment: &environment
+      DATABASE_URL: postgresql://geolens:${POSTGRES_PASSWORD}@db:5432/geolens
+      LENS_DATA_DIR: /data
+      OBSERVATIONS_CSV: ${OBSERVATIONS_CSV:-}
+    volumes:
+      - ./data:/data:ro
+    ports:
+      - "127.0.0.1:8000:8000"
+    depends_on:
+      db:
+        condition: service_healthy
+  worker:
+    build: .
+    command: ["python","worker.py"]
+    environment: *environment
+    volumes:
+      - ./data:/data:ro
+    depends_on:
+      db:
+        condition: service_healthy
+volumes:
+  pgdata:

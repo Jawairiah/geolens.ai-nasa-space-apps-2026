@@ -1,0 +1,15 @@
+.landing .hero-copy h1 {font-size:clamp(45px,5.8vw,92px);letter-spacing:-.04em;max-width:13ch;text-wrap:balance}
+.landing .hero-copy .landing-access {font-size:13px;color:#bbd3df;margin-top:16px}
+.landing-guide,.landing-benefits {max-width:1500px;margin:auto;padding:clamp(26px,5vw,64px) clamp(20px,5vw,78px);border-top:1px solid var(--line)}
+.landing-guide {display:grid;grid-template-columns:1.2fr 1fr;gap:clamp(22px,5vw,70px);background:#101c2b}
+.landing-guide h2,.landing-benefits h2 {font-size:clamp(25px,3.5vw,44px);letter-spacing:-.035em;line-height:1.12;margin:0}
+.landing-guide h3,.landing-use-list h3 {margin:0;font-size:clamp(17px,2vw,22px)}
+.landing-guide p,.landing-use-list p,.landing-scope {max-width:57ch;margin:8px 0 13px}
+.landing-guide a,.landing-benefits a {text-decoration:underline;text-underline-offset:.2em}
+.landing-use-list {display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:24px;margin:24px 0}
+.landing-use-list article {border-top:1px solid #406477;padding-top:15px}
+.landing-use-list article:nth-child(2) {border-color:#d59a74}
+.landing-use-list article:nth-child(3) {border-color:#7bba9e}
+.landing-benefits {scroll-margin-top:18px}
+.landing-scope {font-size:13px}
+@media(max-width:760px) {.landing-guide,.landing-use-list {grid-template-columns:minmax(0,1fr)}}

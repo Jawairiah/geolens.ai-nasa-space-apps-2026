@@ -1,0 +1,151 @@
+/* Earth observation workspace */
+.atlas {
+  --panel:#101b19; --line:#2b4039; --muted:#b4c6be; --cyan:#aee8c8;
+  color:#f0f6ef; max-width:1360px; padding-top:26px; padding-bottom:60px;
+  font-variant-numeric:tabular-nums;
+}
+.atlas ::selection { background:#b8edc9; color:#14251d }
+.atlas :focus-visible { outline-color:#c4efb9 }
+.atlas-intro {
+  isolation:isolate; position:relative; overflow:hidden; display:flex; align-items:center;
+  min-height:238px; padding:36px clamp(20px,5vw,60px); margin-bottom:22px;
+  border:1px solid #31483e; border-radius:16px;
+  background:linear-gradient(105deg,#152923 12%,#12231f 50%,#07120f 100%);
+}
+.atlas-intro-copy {position:relative; z-index:1; max-width:560px}
+.atlas-intro h1 { font-size:clamp(35px,5vw,68px); letter-spacing:-.04em; line-height:1; margin:0 }
+.atlas-intro p {max-width:34ch; margin:12px 0 18px; color:#d0ded5}
+.atlas-source {display:inline-flex; align-items:center; gap:7px; font-size:12px; color:#e8d4a9}
+.atlas-source::before {content:''; width:6px; height:6px; border-radius:50%; background:currentColor}
+.atlas-earth-scene {
+  position:absolute; width:480px; height:310px; right:1%; top:50%; translate:0 -50%;
+  pointer-events:none; transform-origin:center; 
+}
+.atlas-earth {
+  position:absolute; width:248px; height:248px; top:31px; left:116px; border-radius:50%;
+  background:url('/assets/earth.jpg') 55% 50%/auto 100%;
+  box-shadow:inset -30px -14px 45px 14px #06140fee,inset 3px 3px 13px #c9f0d6a0, 12px 14px 44px #020b07;
+  filter:saturate(.7) brightness(.85);
+}
+.atlas-orbit,.atlas-track {position:absolute; inset:46px 43px; border:1px solid #9bc7a84d; border-radius:50%; transform:rotate(-20deg)}
+.atlas-orbit-outer {inset:22px 16px; transform:rotate(21deg); border-color:#9bc7a82d}
+.atlas-track {inset:44px 130px; border:0; z-index:2}
+.atlas-track i {position:absolute; top:8%; left:15%; width:7px; height:7px; border-radius:50%; background:#d4ffd9; box-shadow:0 0 13px #b4ffd2}
+.atlas .investigation-grid {grid-template-columns:minmax(0,1fr) minmax(280px,350px); gap:18px}
+.atlas .atlas-map-column,.atlas .investigation-inputs,.atlas .result-column {min-width:0}
+.atlas .result-column {grid-column:1/-1}
+.atlas .investigation-inputs {gap:10px}
+.atlas .map-frame {background:#13231d;overflow:hidden}
+.atlas .map-window {height:400px;background-color:#0b211b}
+.atlas .map-head {padding:12px 15px;font:600 14px "Instrument Sans",sans-serif;letter-spacing:0}
+.atlas .map-controls button,.atlas .outline {background:#182b24;border-color:#476355}
+.atlas .map-controls button:hover,.atlas .outline:hover {background:#254436}
+.atlas .legend {font:12px "Instrument Sans",sans-serif; padding:12px 15px;gap:9px 15px}
+.atlas .beam {animation:none; background:linear-gradient(transparent 46%,#c1f6ce47 50%,transparent 54%)}
+.atlas .setup {padding:20px}
+.atlas .setup p,.atlas .setup details {color:var(--muted)}
+.atlas .district-selects select,.atlas .candidates select,.atlas .setup details select {background:#0a1812;border-color:#405b4e}
+.atlas .setup-actions button {min-height:42px}
+.atlas .findings {padding:clamp(18px,3vw,32px)}
+.atlas .finding-context {display:flex; flex-wrap:wrap; gap:5px 18px; justify-content:space-between; color:#bdd6c8;font-size:13px}
+.atlas .finding-context span:first-child {font-weight:700}
+.atlas .finding-head h2 {max-width:28ch; letter-spacing:-.035em}
+.atlas .finding-metrics {gap:0; padding-block:12px; border-block:1px solid var(--line)}
+.atlas .finding-metrics>div {border:0;border-radius:0; background:none;padding:8px 16px;border-right:1px solid var(--line)}
+.atlas .finding-metrics>div:first-child {padding-left:0}
+.atlas .finding-metrics>div:last-child {border:0}
+.atlas .finding-metrics strong {font-size:clamp(16px,2vw,21px)}
+.atlas .trend-chart svg {background:#0b1713;max-height:330px}
+.atlas .trend-chart svg line {stroke:#2b4039}
+.atlas .evidence-tools details {padding:13px 0}
+.atlas .use-note {background:#0d1c16}
+@media(max-width:900px) {
+  .atlas .investigation-grid {grid-template-columns:minmax(0,1fr) minmax(245px,290px)}
+  .atlas-earth-scene {right:-105px}
+}
+@media(max-width:680px) {
+  .atlas .investigation-grid {grid-template-columns:minmax(0,1fr)}
+  .atlas .atlas-map-column:empty {display:none}
+  .atlas .map-window {height:295px}
+  .atlas-intro {min-height:205px}
+  .atlas-earth-scene {right:-220px;opacity:.45}
+  .atlas .finding-metrics>div {border:0; padding:8px 0}
+}
+@media(prefers-reduced-motion:reduce) { .atlas .beam {display:none} }
+
+/* Explore is a map and evidence workspace. Keep controls and source context close to the map. */
+.atlas {
+  --panel: #101f1c;
+  --line: #304840;
+  --muted: #b7ccc4;
+  --text: #eff8f3;
+  --cyan: #a8f0cd;
+  max-width: 1440px;
+  padding-top: 22px;
+}
+.atlas .atlas-intro { min-height: 158px; padding-block: 24px; margin-bottom: 16px; border-radius: 12px; }
+.atlas .atlas-intro h1 { font-size: clamp(34px,5vw,57px); letter-spacing: -.035em; }
+.atlas .atlas-intro p { margin: 8px 0 12px; max-width: 50ch; }
+.atlas .atlas-earth-scene { right: 0; }
+.atlas .atlas-source { text-underline-offset: 4px; }
+.atlas a.atlas-source:hover { text-decoration: underline; }
+.atlas .investigation-grid { grid-template-columns: minmax(0,1fr) minmax(270px,330px); align-items: start; gap: 16px; }
+.atlas .map-window { height: clamp(340px, 45vh, 505px); }
+.atlas .map-head > span { color: var(--text); }
+.atlas .map-controls button { min-width: 38px; min-height: 36px; }
+.atlas .atlas-map-placeholder { min-height: 340px; display: grid; place-items: center; background: var(--panel); border: 1px solid var(--line); border-radius: 12px; color: var(--muted); }
+.atlas .atlas-boundary { margin: 8px 4px 0; color: #ecd5a7; font-size: 13px; }
+.atlas .atlas-district-fields { grid-template-columns: 1fr; }
+.atlas .atlas-district-fields span { display: flex; align-items: center; gap: 6px; }
+.atlas .district-selects select, .atlas .atlas-quality select { min-height: 40px; }
+.atlas .atlas-quality { display: grid; gap: 5px; margin-bottom: 16px; font-size: 12px; color: var(--muted); }
+.atlas .atlas-quality select { background: #0a1812; border-color: #405b4e; }
+.atlas .place-search { margin-top: 14px; padding: 10px 0 0; border: 0; border-top: 1px solid var(--line); border-radius: 0; background: none; }
+.atlas button:disabled { cursor: default; }
+.atlas .atlas-candidates, .atlas .atlas-provenance { grid-column: 1/-1; }
+.atlas .atlas-candidates { margin-top: 0; }
+.atlas .atlas-candidate-list { display: grid; grid-template-columns: repeat(2,minmax(0,1fr)); gap: 0 22px; }
+.atlas .atlas-candidate-list button { display: grid; justify-items: start; text-align: left; gap: 4px; min-height: 60px; padding: 10px 4px; }
+.atlas .atlas-candidate-list button[aria-pressed=true] { color: var(--cyan); }
+.atlas .atlas-candidate-list button span { color: var(--muted); }
+.atlas .result-column { scroll-margin-top: 18px; }
+.atlas .result-empty { padding: 20px 24px; }
+.atlas .result-empty h2 { margin-top: 0; }
+.atlas .result-empty p { margin-bottom: 0; }
+.atlas .finding-context { align-items: baseline; }
+.atlas .finding-head h2 { max-width: 34ch; }
+.atlas .finding-metrics > div { min-width: 0; }
+.atlas .finding-metrics > div:last-child { background: #162a22; border-radius: 6px; padding-inline: 14px; }
+.atlas .atlas-coverage th, .atlas .atlas-coverage td { font-variant-numeric: tabular-nums; }
+.atlas .atlas-provenance { background: var(--panel); padding: 15px 20px; border: 1px solid var(--line); border-radius: 12px; }
+.atlas .atlas-provenance dl { margin: 14px 0; }
+.atlas .atlas-provenance dl > div { display: grid; grid-template-columns: minmax(110px,155px) 1fr; gap: 10px; padding: 8px 0; border-top: 1px solid var(--line); }
+.atlas .atlas-provenance dt { color: var(--muted); }
+.atlas .atlas-provenance dd { margin: 0; }
+.atlas .atlas-provenance a { text-decoration: underline; text-underline-offset: 3px; }
+@media (max-width: 760px) {
+  .atlas .investigation-grid, .atlas .atlas-candidate-list { grid-template-columns: minmax(0,1fr); }
+  .atlas .atlas-intro { min-height: 150px; }
+  .atlas .atlas-earth-scene { right: -200px; opacity: .48; }
+  .atlas .map-window { height: 300px; }
+  .atlas .atlas-district-fields { grid-template-columns: repeat(2,minmax(0,1fr)); }
+  .atlas .finding-metrics > div:last-child { padding: 8px 12px; }
+}
+@media (max-width: 440px) {
+  .atlas .atlas-district-fields { grid-template-columns: 1fr; }
+  .atlas .atlas-provenance dl > div { grid-template-columns: 1fr; gap: 3px; }
+}
+
+.atlas.workspace { padding-top: 22px; }
+.atlas .panel.setup, .atlas .panel.findings, .atlas .panel.result-empty, .atlas .atlas-candidates { background: #101f1c; }
+.atlas .primary { background: #a8f0cd; color: #09261c; }
+.atlas .primary:hover:not(:disabled) { background: #c8f8dc; }
+.atlas .district-label { font-size: 13px; stroke-width: 2.5px; }
+@media (max-width: 760px) { .atlas .atlas-earth-scene { opacity: .30; } }
+
+.atlas .forest-evidence > .findings + .findings {margin-top:16px}
+.atlas .forest-crumb {display:inline-block;margin-bottom:10px;font-size:.85rem}
+.atlas .atlas-intro h1 {text-wrap:balance}
+.atlas .forest-evidence details {margin:12px 0}
+
+.atlas .forest-evidence {min-width:0}
