@@ -10,6 +10,9 @@ WORKDIR /app
 COPY backend/requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt
 COPY backend/ .
+COPY data/ /data/
+ENV LENS_DATA_DIR=/data
+ENV OBSERVATIONS_CSV=/data/observations.csv
 COPY --from=frontend /build/dist /web
 RUN useradd --system --uid 10001 geolens
 USER geolens
