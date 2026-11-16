@@ -1,100 +1,109 @@
-# GeoLens
+# GeoLens.ai
 
-GeoLens is a full-stack Earth observation application. Its Karachi pilot discovers regional NDVI contrasts on Terra, checks the same pair on Aqua, and exposes the sensitivity of the result to date and quality settings.
+**See more. Analyze better.**
 
-## Architecture
+GeoLens is an Earth observation platform built for the **NASA Space Apps Challenge 2026**. It helps people investigate how rainfall, surface heat, and vegetation have changed across Karachi’s historical districts. Choose two districts, compare the satellite records, and see how much the evidence supports the result.
 
-- `frontend/` contains the React, TypeScript, Vite and Tailwind application. The landing uses a lazy-loaded Three.js Earth with a static-image fallback. The workspace projects selectable administrative districts on a satellite tile basemap and plots matched observations.
-- `backend/main.py` serves the UI and API. Read-only comparisons can be explored anonymously. Authenticated accounts can create projects and queue saved comparisons.
-- `backend/worker.py` takes jobs from PostgreSQL with row locking and writes completed evidence back. `backend/schema.sql` defines accounts, sessions, projects, regions and jobs.
-- `backend/extract.py` submits Terra/Aqua exports to Earth Engine. `backend/prepare.py` validates the exports and creates the CSV, coverage audit and source manifest. `backend/analysis.py` runs the statistical comparisons.
-- The full-stack entry point is Docker Compose. The legacy HTML entry points now link to the full-stack application.
+**[Live demo](https://geolensai-nasa-space-apps-2026.vercel.app/)** · **[Open the lenses](https://geolensai-nasa-space-apps-2026.vercel.app/lenses)** · **[Inspection demo](https://geolensai-nasa-space-apps-2026.vercel.app/inspections/demo)**
+
+## What you can investigate
+
+| Lens | What it shows |
+| --- | --- |
+| **Water & Drought Intelligence** | Compare monthly rainfall trends and July–September anomalies. Check modeled soil moisture and evapotranspiration, and review the 2024 SMAP coverage check. |
+| **Urban Heat & Growth Intelligence** | Compare daytime and nighttime land-surface temperature. Explore heat contrasts between built-up and non-built land and review annual land-cover context. |
+| **Land Cover & Forest Change** | Compare monthly vegetation greenness (NDVI) and annual tree-canopy estimates. Cross-check Terra greenness trends with Aqua and review the 2023 land-cover snapshot. |
+
+Each lens includes an interactive district map, key findings, and separate pages for **Trend estimates**, **Observation records**, and **Sources & methods**. You can filter records by year, download the evidence as JSON, and share a detail-page URL that preserves the comparison settings.
+
+### Try the demo
+
+1. Open **Lenses → Land Cover & Forest Change**.
+2. Select **Karachi East** and **Malir**, set **2003–2024** and **Standard** quality, then click **Compare selected**.
+3. Under **Ask about this comparison**, choose **Is the change statistically significant?** and read the finding for the difference between districts.
+4. Open **Trend estimates** or **Observation records** to see the chart and the values behind it.
+
+The public comparison and [practice inspection](https://geolensai-nasa-space-apps-2026.vercel.app/inspections/demo) are available without signing in. Practice notes stay in the current browser tab and clear when you leave the demo. Persistent staff workflows require PostgreSQL/PostGIS and configured reviewer or inspector roles.
+
+## Data and attribution
+
+GeoLens uses district-level extracts prepared through Google Earth Engine. The deployed backend reads those files and calculates comparisons on request. Earth Engine credentials are required to refresh the extracts. Dataset coverage and quality vary by product and are shown in **Sources & methods**.
+
+| Source | Role in GeoLens |
+| --- | --- |
+| [NASA GPM IMERG Monthly V07](https://developers.google.com/earth-engine/datasets/catalog/NASA_GPM_L3_IMERG_MONTHLY_V07) | Monthly rainfall and monsoon anomalies |
+| [NASA GLDAS Noah v2.1](https://developers.google.com/earth-engine/datasets/catalog/NASA_GLDAS_V021_NOAH_G025_T3H) | Modeled soil moisture and evapotranspiration |
+| [NASA SMAP SPL3SMP_E v006](https://developers.google.com/earth-engine/datasets/catalog/NASA_SMAP_SPL3SMP_E_006) | 2024 satellite soil-moisture coverage check |
+| [Terra MODIS MOD11A2 v6.1](https://developers.google.com/earth-engine/datasets/catalog/MODIS_061_MOD11A2) | Daytime and nighttime land-surface temperature |
+| [MODIS MCD12Q1 v6.1](https://developers.google.com/earth-engine/datasets/catalog/MODIS_061_MCD12Q1) | Built-up and non-built classification and land-cover context |
+| [Terra MODIS MOD13A3 v6.1](https://developers.google.com/earth-engine/datasets/catalog/MODIS_061_MOD13A3) | Monthly vegetation greenness (NDVI) |
+| [Aqua MODIS MYD13A3 v6.1](https://developers.google.com/earth-engine/datasets/catalog/MODIS_061_MYD13A3) | Cross-check for the Terra greenness comparison |
+| [Terra MODIS MOD44B v6.1](https://developers.google.com/earth-engine/datasets/catalog/MODIS_061_MOD44B) | Annual tree-canopy cover estimates |
+
+District boundaries come from [OCHA Pakistan COD-AB](https://data.humdata.org/dataset/cod-ab-pak) under CC BY 3.0 IGO. The pilot uses six historical Karachi districts, with Keamari represented within the older geography. The globe uses [NASA Blue Marble](https://science.nasa.gov/resource/blue-marble/) imagery. The district map credits Esri and contributors for the optional satellite basemap.
+
+### How to interpret the evidence
+
+- **Greenness and canopy cover measure different quantities.** NDVI captures vegetation greenness, and MOD44B estimates annual tree-canopy cover.
+- **Surface temperature measures ground and built surfaces.** Review the separate daytime and nighttime coverage and use field observations to assess site conditions.
+- **Compare uncertainty alongside trend estimates.** The monthly paired analysis uses shared months, accounts for seasonal effects, and reports approximate intervals. If the interval for the district difference includes zero, the result is inconclusive.
+- **Use district trends for screening.** The 2023 land-cover snapshot provides context. Confirm individual land changes and causes with site-scale evidence.
 
 ## Run locally
 
-Prerequisites are Docker with Compose and internet access to pull the images and install dependencies.
+### Public demo with Docker
 
-1. Copy `.env.example` to `.env`. Set `POSTGRES_PASSWORD` to a strong random alphanumeric value.
-2. Run `docker compose up --build` from this directory.
-3. Open http://localhost:8000. The API description is at http://localhost:8000/docs.
-4. Open **Lenses → Land Cover & Forest Change**. Choose two districts or scan for contrasts. See the data setup below if analysis is unavailable. **Projects** supports saved projects and enables queueing when observations are available.
-
-If `OBSERVATIONS_CSV` is unset, `GET /api/study` reports `manifest.mode: unavailable`. Scan and comparison requests return HTTP 503. With a configured extract, startup checks that the CSV matches the manifest hash, row count, product IDs, and boundary source. Browser basemap imagery requires internet access.
-
-For local frontend development with the backend running on port 8000, run `npm install` and `npm run dev` in `frontend/`.
-
-## Prepare real satellite observations
-
-The packaged pilot includes the 2003–2024 Terra and Aqua observation bundle. Set `OBSERVATIONS_CSV=/data/observations.csv` in `.env` for Docker Compose and run `docker compose up --build`. For a native backend, set `OBSERVATIONS_CSV` to the absolute local CSV path. An explicitly empty setting keeps analysis unavailable. A malformed extract fails startup.
-
-To rebuild it, install the backend Python requirements and authenticate with Earth Engine on your machine. From `backend/`, fetch source rows and run the completeness check:
+From the repo root, with Docker running:
 
 ```powershell
+docker build -t geolens-demo .
+docker run --rm -p 127.0.0.1:8000:8000 geolens-demo
+```
+
+Open [http://localhost:8000](http://localhost:8000). See [API docs](http://localhost:8000/docs) or confirm dataset loading at [`/api/study`](http://localhost:8000/api/study), where `manifest.mode` should be `"source extract"`.
+
+### Local staff workflows with Docker Compose
+
+If you want to try saved projects, queued comparisons, or persistent inspections, copy [`.env.example`](.env.example) to `.env` and set a strong `POSTGRES_PASSWORD`. Keep `OBSERVATIONS_CSV=/data/observations.csv` and run:
+
+```powershell
+docker compose up --build
+```
+
+Compose starts the API, PostgreSQL/PostGIS, and the job worker. Its database initialization applies [`backend/schema.sql`](backend/schema.sql) and [`backend/inspections.sql`](backend/inspections.sql) on a fresh data volume. For an existing database, apply the inspection migration explicitly. A database administrator assigns staff roles through the `inspection_members` table.
+
+### Development checks
+
+Run the backend tests from `backend/` with `python -m unittest -v` after installing its requirements. Use `npm ci` and `npm run build` from `frontend/` to type-check and bundle the UI. With the API running on port 8000, `npm run dev` in `frontend/` starts the Vite development server.
+
+## Deployment and data refresh
+
+The live demo deploys to **Vercel’s Container runtime**. The root [`Dockerfile`](Dockerfile) builds the React frontend, copies the observation extracts into `/data`, and starts FastAPI on port `8000`. [`vercel.json`](vercel.json) selects the Container preset. In Vercel, use the repository root and set **`PORT=8000`** for the target environment. The public demo can run with `DATABASE_URL` unset.
+
+The loader verifies the observation CSV and district geometry against the source manifest. [`.gitattributes`](.gitattributes) preserves the exact bytes of those files across Git checkouts. After deploying a refreshed dataset, check the production [study endpoint](https://geolensai-nasa-space-apps-2026.vercel.app/api/study) and run one comparison in each lens.
+
+To refresh the exports, use a registered Earth Engine project with the API enabled. From `backend/`, install `requirements.txt`, authenticate with `earthengine authenticate`, and run the extraction commands for the datasets you want to update. These PowerShell commands regenerate the pilot’s configured observation periods:
+
+```powershell
+$project = "YOUR_GOOGLE_CLOUD_PROJECT_ID"
 $years = 2003..2024
-python extract.py --project YOUR_PROJECT_ID --output ../modis-download --year $years
+python extract.py --project $project --output ../modis-download --year $years
 python prepare.py ../modis-download ../data/observations.csv --require-complete
+
+python extract_rain.py --project $project --output ../data/rainfall.json
+python extract_gldas.py --project $project --output ../data/gldas.json
+python extract_smap.py --project $project --output ../data/smap.json
+python extract_heat.py --project $project --output ../data/heat.json
+python extract_canopy.py --project $project --output ../data/canopy.json
 ```
 
-Observation files include accepted NDVI values, a coverage audit with original image IDs and land area denominators, and a manifest. The archive also contains `data/earth-engine-source.zip` with the district aggregates returned by Earth Engine for independent reproduction. Seasons and differences are evaluated over a fixed six-district historical boundary release. The bundled map has no separate Keamari district. The current official district geography needs a verified boundary release before operational use.
+## Tech stack
 
-Monthly NDVI uses area-weighted native-grid pixels. The contrast is fitted on months valid in both cells, with month-of-year effects and calendar-lag HAC uncertainty. Short or sparse series are flagged. Scans and their pointwise confidence intervals are exploratory. Terra and Aqua share MODIS processing assumptions.
+- **Frontend** · React, TypeScript, Vite, Tailwind CSS, and Three.js
+- **Backend** · FastAPI and NumPy
+- **Data preparation** · Google Earth Engine and Python
+- **Storage and hosting** · PostgreSQL/PostGIS for staff workflows, Docker and Vercel for the public demo
 
-## Verify and deploy
+## Team
 
-From `backend/`, run `python -m unittest -v`. From `frontend/`, run `npm run build` to type-check and bundle the app. With an empty `OBSERVATIONS_CSV`, confirm Explore displays **Analysis unavailable**, the map still works, and **Compare selected** and **Find contrasting districts** are disabled. In `/docs`, send a valid request to `POST /api/scan` with start 2003, end 2024, and quality standard. Expect HTTP 503. After loading verified observations, smoke-test by scanning, revealing Aqua, downloading evidence, and completing a queued job. Verify project ownership with a second account before public release.
-
-For deployment, build the Docker image, place the API behind a TLS reverse proxy, run the worker as a separate service, and provision PostgreSQL/PostGIS with a persistent volume and backups. Apply `backend/schema.sql` to an empty database. Keep secrets in the deployment platform and use a database URL appropriate to its network. Use ingress rate limits for auth and compute routes and review the session lifecycle before public registration.
-
-The analysis coverage of this release is the six Karachi districts in the OCHA COD-AB release. Worldwide city search uses Open-Meteo geocoding. Analysis in new study areas requires additional region configuration and satellite preparation. The landing Earth visual and basemap are contextual imagery. Analytic results depend on the observation bundle. Historical imagery playback, an independent real-data extraction check, and production-scale security and load testing are release work.
-
-District boundaries: [OCHA Pakistan COD-AB](https://data.humdata.org/dataset/cod-ab-pak), CC BY 3.0 IGO. The source represents Keamari within the older district geography rather than as a separate feature. Existing grid observations must be re-extracted with the district geometry. For an existing database, apply backend/schema.sql to migrate project geometry to MultiPolygon.
-
-
-## Municipal inspections
-
-For a fresh Compose database the inspection tables are created automatically. With an existing GeoLens database, apply the additive migration before opening Inspections:
-
-```powershell
-Get-Content -Raw .\backend\inspections.sql | docker compose exec -T db psql -v ON_ERROR_STOP=1 -U geolens -d geolens
-```
-
-Register individual accounts in Projects. A database administrator grants inspection access with the following SQL in the GeoLens database. Replace the two usernames with the accounts you registered.
-
-```sql
-INSERT INTO inspection_members (account_id, role)
-SELECT id, 'reviewer' FROM accounts WHERE username = 'municipal-reviewer';
-INSERT INTO inspection_members (account_id, role)
-SELECT id, 'inspector' FROM accounts WHERE username = 'field-inspector';
-```
-
-1. Compare Karachi Central and Malir in Explore for 2003–2024 at Standard quality. Select **Open inspection case** and sign in as the reviewer. Enter a title and field question, then open the case. Verify the case's original comparison includes the source manifest and matched-month runs.
-2. Assign the visit to the inspector. Enter a specific field site and instructions. Sign out.
-3. Sign in as the inspector. Open the assigned case and submit the visit date, observations, and references to supporting evidence.
-4. Sign in as the reviewer and close the case with an outcome, or return it with follow-up instructions. Verify the activity history shows each actor and timestamp. A closed case can still be viewed and its original comparison exported.
-5. Sign in with an ordinary account without an inspection role. The inspection queue should be denied. An inspector should see only cases assigned to their account.
-
-Reviewers can access the full inspection queue in this single-team pilot. Field evidence consists of notes and document or photo references entered by staff. District trends are screening evidence. The reviewer selects and verifies a specific site before assigning a visit.
-
-## Investigation lenses
-
-The Lenses section lists the three original investigation areas and their core datasets. Earth Engine catalog access and one pilot-area sample per lens have been verified. Water & Drought includes paired 2003–2024 GPM IMERG precipitation comparisons and JSON export. The Water & Drought workflow also includes July–September precipitation anomalies against 2003–2020, a sensitivity run excluding 2010 and 2022, and a 2024 SMAP coverage check. It also compares published GLDAS Noah v2.1 top-10-cm soil moisture and evapotranspiration, and screens matching IMERG, GLDAS and Terra NDVI months. Land Cover & Forest Change reuses the Terra and Aqua greenness analysis. Land Cover & Forest Change compares Terra and Aqua vegetation greenness and annual MOD44B canopy.
-
-Regenerate precipitation with `python extract_rain.py --project YOUR_PROJECT_ID --output ../data/rainfall.json` from the backend directory. For Compose, the dataset is mounted under `/data`.
-
-Regenerate the 2024 SMAP AM archive with `python extract_smap.py --project YOUR_PROJECT_ID --output ../data/smap.json` from the backend directory. It keeps only passing AM retrievals in [0,1] and requires at least five qualifying days per pixel per month. District means are weighted by valid pixel area. Missing records are left absent. The IMERG baseline requires at least 15 complete July–September seasons, and incomplete selected seasons are unavailable.
-
-Regenerate temporal GLDAS coverage and values with `python extract_gldas.py --project YOUR_PROJECT_ID --output ../data/gldas.json` from the backend. The export records the source collection and bands, UTC query windows, source step requirements, valid area and boundary fingerprint. NASA GLDAS is a land model. Its roughly 28 km native grid can overlap several Karachi districts. The mismatch rule uses approximate pointwise confidence intervals as an exploratory screen, and an inconclusive rainfall result does not imply that rainfall was stable.
-
-## Urban Heat & Growth
-
-Open **Lenses → Urban Heat & Growth**. The lens uses Terra MOD11A2 v6.1 surface temperatures for 2003–2024, MCD12Q1 v6.1 land-cover classifications through 2023, and the existing quality-screened Terra NDVI extract. Surface temperatures represent clear-sky observations. The default nighttime/daytime results have separate coverage checks. Use the district trend map for screening and the paired district table for comparison. The district map and extract use the six historical OCHA districts.
-
-The district-local non-built reference includes natural and agricultural land and requires consistent labels in the 2003, 2013, and 2023 anchor years, as does the urban mask. Composites require 30% area coverage and a month requires at least half of its source composites. Both strata must share the composite dates. Each stratum needs at least 5 km² of reference area. Use the annual built-up classifications for context and confirm land changes with site-scale evidence. Inspect shared months and intervals alongside the estimates.
-
-Regenerate the archive from `backend/` with `python extract_heat.py --project YOUR_PROJECT_ID --output ../data/heat.json`. The included evidence export identifies the source collections, historical boundary fingerprint, MOD11A2 image IDs, paired composite dates, and classification image IDs. The application uses the cached source extract under the existing `LENS_DATA_DIR`.
-
-## Land Cover & Forest Change
-
-The old Explore route redirects to this lens. Use the district map and comparison controls, then review the independent NDVI and canopy panels. The combined evidence JSON contains both analyses and source image IDs. The NDVI result also links to Inspections. Annual MOD44B canopy estimates are based on the same valid pixels across the 2003–2024 archive. The annual table reports MOD44B input quality separately. The optional MCD12Q1 2023 built-up summary provides land-cover context.
-
-Regenerate from the backend with `python extract_canopy.py --project YOUR_PROJECT_ID --output ../data/canopy.json`.
+**Maham Mohsin** · **Jawairia Hammad** · **Huzaila Asif** · **Manha Fatima**
